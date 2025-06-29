@@ -1,30 +1,30 @@
 resource "aws_sfn_state_machine" "etl" {
-  name     = "etl-step-function"
+  name     = "b3-etl-step-function"
   role_arn = var.lab_role_arn
   definition = jsonencode({
-    StartAt = "Step1",
+    StartAt = "Extract",
     States = {
-      Step1 = {
+      Extract = {
         Type     = "Task",
         Resource = "arn:aws:states:::glue:startJobRun.sync",
         Parameters = {
-          JobName = var.glue_job_step1_name
+          JobName = var.glue_extract_job_name
         },
-        Next = "Step2"
+        Next = "Transform"
       },
-      Step2 = {
+      Transform = {
         Type     = "Task",
         Resource = "arn:aws:states:::glue:startJobRun.sync",
         Parameters = {
-          JobName = var.glue_job_step2_name
+          JobName = var.glue_transform_job_name
         },
-        Next = "Step3"
+        Next = "Load"
       },
-      Step3 = {
+      Load = {
         Type     = "Task",
         Resource = "arn:aws:states:::glue:startJobRun.sync",
         Parameters = {
-          JobName = var.glue_job_step3_name
+          JobName = var.glue_load_job_name
         },
         End = true
       }

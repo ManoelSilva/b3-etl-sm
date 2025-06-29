@@ -33,8 +33,8 @@ resource "aws_s3_object" "load_script" {
   etag   = filemd5("${path.module}/../../jobs/load.py")
 }
 
-resource "aws_glue_job" "step1" {
-  name     = "etl-step-1"
+resource "aws_glue_job" "extract" {
+  name     = "etl-extract-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"
@@ -45,8 +45,8 @@ resource "aws_glue_job" "step1" {
   max_capacity = 2
 }
 
-resource "aws_glue_job" "step2" {
-  name     = "etl-step-2"
+resource "aws_glue_job" "transform" {
+  name     = "etl-transform-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"
@@ -57,8 +57,8 @@ resource "aws_glue_job" "step2" {
   max_capacity = 2
 }
 
-resource "aws_glue_job" "step3" {
-  name     = "etl-step-3"
+resource "aws_glue_job" "load" {
+  name     = "etl-load-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"
@@ -69,12 +69,12 @@ resource "aws_glue_job" "step3" {
   max_capacity = 2
 }
 
-output "glue_job_step1_name" {
-  value = aws_glue_job.step1.name
+output "glue_extract_job_name" {
+  value = aws_glue_job.extract.name
 }
-output "glue_job_step2_name" {
-  value = aws_glue_job.step2.name
+output "glue_transform_job_name" {
+  value = aws_glue_job.transform.name
 }
-output "glue_job_step3_name" {
-  value = aws_glue_job.step3.name
+output "glue_load_job_name" {
+  value = aws_glue_job.load.name
 } 

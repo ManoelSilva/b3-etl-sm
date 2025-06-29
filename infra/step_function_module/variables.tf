@@ -1,19 +1,19 @@
-variable "glue_job_step1_name" {
-  description = "Nome do Glue Job Step 1"
+variable "glue_extract_job_name" {
+  description = "Nome do Glue Job Step de Extração"
   type        = string
-  default = "etl-step-1"
+  default = "etl-extract-step"
 }
 
-variable "glue_job_step2_name" {
-  description = "Nome do Glue Job Step 2"
+variable "glue_transform_job_name" {
+  description = "Nome do Glue Job Step de Transformação"
   type        = string
-  default = "etl-step-2"
+  default = "etl-transform-step"
 }
 
-variable "glue_job_step3_name" {
-  description = "Nome do Glue Job Step 3"
+variable "glue_load_job_name" {
+  description = "Nome do Glue Job Step de Carregamento"
   type        = string
-  default = "etl-step-3"
+  default = "etl-load-step"
 }
 
 variable "lab_role_arn" {
