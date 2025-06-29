@@ -1,0 +1,24 @@
+{
+  "name": "AWS Glue PySpark",
+  "image": "public.ecr.aws/glue/aws-glue-libs:5",
+  "customizations": {
+    "jetbrains" : {
+      "backend" : "IntelliJ"
+    },
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  },
+  "mounts": [
+    "source=${localEnv:USERPROFILE}\\.aws,target=/home/hadoop/.aws,type=bind",
+    "source=${localWorkspaceFolder}/jobs,target=/home/hadoop/workspace,type=bind"
+  ],
+  "env": {
+    "AWS_PROFILE": "default"
+  },
+  "remoteUser": "hadoop"
+}
