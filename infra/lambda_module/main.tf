@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "etl_trigger" {
-  function_name = "etl-s3-trigger"
+  function_name = "b3_etl_s3_trigger"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
   role          = var.lab_role_arn

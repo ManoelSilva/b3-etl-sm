@@ -7,7 +7,7 @@ variable "lambda_zip_path" {
 variable "step_function_arn" {
   description = "ARN da Step Function"
   type        = string
-  default = "arn:aws:states:us-east-1:861115334572:stateMachine:etl-step-function"
+  default = "arn:aws:states:us-east-1:861115334572:stateMachine:b3-etl-step-function"
 }
 
 variable "lab_role_arn" {
