@@ -1,11 +1,11 @@
 variable "lab_role_arn" {
-  description = "ARN da role LabRole"
+  description = "ARN of the LabRole role"
   type        = string
   default = "arn:aws:iam::861115334572:role/LabRole"
 }
 
 variable "bucket_name" {
-  description = "Nome do bucket S3 para scripts do Glue."
+  description = "Name of the S3 bucket for Glue scripts."
   type        = string
   default = "861115334572-glue"
 } 
