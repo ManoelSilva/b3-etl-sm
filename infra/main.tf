@@ -1,4 +1,4 @@
-// Terraform principal para ETL S3 → Glue
+// Main Terraform for ETL S3 → Glue
 
 terraform {
   required_providers {

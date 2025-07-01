@@ -34,7 +34,7 @@ resource "aws_s3_object" "load_script" {
 }
 
 resource "aws_glue_job" "extract" {
-  name     = "etl-extract-step"
+  name     = "b3-etl-extract-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"
@@ -46,7 +46,7 @@ resource "aws_glue_job" "extract" {
 }
 
 resource "aws_glue_job" "transform" {
-  name     = "etl-transform-step"
+  name     = "b3-etl-transform-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"
@@ -58,7 +58,7 @@ resource "aws_glue_job" "transform" {
 }
 
 resource "aws_glue_job" "load" {
-  name     = "etl-load-step"
+  name     = "b3-etl-load-step"
   role_arn = var.lab_role_arn
   command {
     name            = "glueetl"

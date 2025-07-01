@@ -4,15 +4,15 @@ from botocore.exceptions import ClientError
 import re
 
 ## @params: [JOB_NAME]
-# (Mantido para compatibilidade, mas não usado)
+# (Kept for compatibility, but not used)
 # args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
-# Parâmetros do S3 e Glue
+# S3 and Glue parameters
 ds3_path = 's3://861115334572-raw/'
-database = 'b3_db'
+database = 'default'
 table_name = 'b3_tbl'
 
-# Definição do schema e formatos (usado na tabela e nas partições)
+# Schema and formats definition (used in the table and partitions)
 schema_columns = [
     {'Name': 'segment', 'Type': 'int'},
     {'Name': 'cod', 'Type': 'string'},
@@ -29,25 +29,25 @@ serde_info = {
     'Parameters': {}
 }
 
-# Cria boto3 clients
+# Create boto3 clients
 session = boto3.Session()
 glue_client = session.client('glue')
 s3_client = session.client('s3')
 
-# Cria o database se não existir
+# Create the database if it does not exist
 try:
     glue_client.create_database(DatabaseInput={'Name': database})
 except ClientError as e:
     if e.response['Error']['Code'] != 'AlreadyExistsException':
         raise
 
-# Cria a tabela se não existir
+# Create the table if it does not exist
 try:
     glue_client.get_table(DatabaseName=database, Name=table_name)
-    # Se não lançar exceção, a tabela já existe
+    # If no exception is raised, the table already exists
 except ClientError as e:
     if e.response['Error']['Code'] == 'EntityNotFoundException':
-        # Tabela não existe, então cria
+        # Table does not exist, so create it
         glue_client.create_table(
             DatabaseName=database,
             TableInput={
@@ -71,13 +71,13 @@ except ClientError as e:
     elif e.response['Error']['Code'] != 'AlreadyExistsException':
         raise
 
-# Descobre as partições 'date' presentes no S3
+# Discover 'date' partitions present in S3
 bucket = ds3_path.replace('s3://', '').split('/')[0]
 prefix = ds3_path.replace(f's3://{bucket}/', '')
 if prefix and not prefix.endswith('/'):
     prefix += '/'
 
-# Lista as pastas de partição
+# List partition folders
 paginator = s3_client.get_paginator('list_objects_v2')
 partition_values = set()
 for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
@@ -86,7 +86,7 @@ for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
         if match:
             partition_values.add(match.group(1))
 
-# Registra as partições no Glue
+# Register partitions in Glue
 partitions = []
 for value in partition_values:
     partitions.append({
@@ -102,7 +102,7 @@ for value in partition_values:
     })
 
 if partitions:
-    # O batch_create_partition aceita até 100 partições por chamada
+    # batch_create_partition accepts up to 100 partitions per call
     for i in range(0, len(partitions), 100):
         glue_client.batch_create_partition(
             DatabaseName=database,

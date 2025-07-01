@@ -1,23 +1,23 @@
 variable "glue_extract_job_name" {
-  description = "Nome do Glue Job Step de Extração"
+  description = "Name of the Glue Job Extraction Step"
   type        = string
-  default = "etl-extract-step"
+  default = "b3-etl-extract-step"
 }
 
 variable "glue_transform_job_name" {
-  description = "Nome do Glue Job Step de Transformação"
+  description = "Name of the Glue Job Transformation Step"
   type        = string
-  default = "etl-transform-step"
+  default = "b3-etl-transform-step"
 }
 
 variable "glue_load_job_name" {
-  description = "Nome do Glue Job Step de Carregamento"
+  description = "Name of the Glue Job Load Step"
   type        = string
-  default = "etl-load-step"
+  default = "b3-etl-load-step"
 }
 
 variable "lab_role_arn" {
-  description = "ARN da role LabRole"
+  description = "ARN of the LabRole role"
   type        = string
   default = "arn:aws:iam::861115334572:role/LabRole"
 } 
