@@ -3,6 +3,11 @@ resource "aws_s3_bucket" "scripts" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket" "refined" {
+  bucket        = var.refined_bucket_name
+  force_destroy = true
+}
+
 resource "aws_s3_bucket_public_access_block" "block" {
   bucket = aws_s3_bucket.scripts.id
 
