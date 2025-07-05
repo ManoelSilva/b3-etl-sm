@@ -7,6 +7,7 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.dynamicframe import DynamicFrame
 import re
+import logging
 
 # @params: [JOB_NAME]
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -106,25 +107,29 @@ s3_client = boto3.client('s3')
 bucket = bucket_name
 prefix = 'b3/'
 
-# List partition directories in S3 (code=XXX/reference_date=YYYY-MM-DD/)
+logging.basicConfig(level=logging.INFO)
+
 partitions = set()
 paginator = s3_client.get_paginator('list_objects_v2')
-for page in paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter='/'):
+for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
     for obj in page.get('Contents', []):
+        # Key example: b3/code=ABC/reference_date=2024-01-01/file.parquet
         match = re.search(r'code=([^/]+)/reference_date=([^/]+)/', obj['Key'])
         if match:
             code = match.group(1)
             reference_date = match.group(2)
             partitions.add((code, reference_date))
+            logging.info(f"Found partition: code={code}, reference_date={reference_date}")
 
 # Build the list of partitions for Glue
 partition_inputs = []
 for code, reference_date in partitions:
+    partition_location = f's3://{bucket}/b3/code={code}/reference_date={reference_date}/'
     partition_inputs.append({
         'Values': [code, reference_date],
         'StorageDescriptor': {
             'Columns': schema_columns,
-            'Location': f's3://{bucket}/b3/code={code}/reference_date={reference_date}/',
+            'Location': partition_location,
             'InputFormat': input_format,
             'OutputFormat': output_format,
             'SerdeInfo': serde_info,
@@ -132,14 +137,22 @@ for code, reference_date in partitions:
         },
         'Parameters': {}
     })
+    logging.info(f"Prepared partition input: {partition_location}")
 
 # Explicitly register partitions (in batches of up to 100)
 if partition_inputs:
     for i in range(0, len(partition_inputs), 100):
-        glue_client.batch_create_partition(
-            DatabaseName=database_name,
-            TableName=table_name,
-            PartitionInputList=partition_inputs[i:i+100]
-        )
+        try:
+            response = glue_client.batch_create_partition(
+                DatabaseName=database_name,
+                TableName=table_name,
+                PartitionInputList=partition_inputs[i:i+100]
+            )
+            if response.get('Errors'):
+                logging.error(f"Errors creating partitions: {response['Errors']}")
+            else:
+                logging.info(f"Successfully created partitions batch {i//100 + 1}")
+        except Exception as e:
+            logging.error(f"Exception during batch_create_partition: {e}")
 
 job.commit()
