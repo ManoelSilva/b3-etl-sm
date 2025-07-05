@@ -84,23 +84,6 @@ df = spark.read.parquet(input_path)
 
 dyf = DynamicFrame.fromDF(df, glueContext, 'dyf')
 
-# Write to Glue Data Catalog, adding partitions
-output = glueContext.write_dynamic_frame.from_options(
-    frame=dyf,
-    connection_type="s3",
-    connection_options={
-        "path": input_path,
-        "partitionKeys": ["code", "reference_date"],
-        "enableUpdateCatalog": True,
-        "updateBehavior": "UPDATE_IN_DATABASE",
-        "database": database_name,
-        "tableName": table_name
-    },
-    format="parquet",
-    format_options={"compression": "SNAPPY"}
-)
-
-# Explicitly register partitions in Glue Data Catalog
 s3_client = boto3.client('s3')
 
 # Extract bucket and prefix from input_path
@@ -119,7 +102,6 @@ for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
             code = match.group(1)
             reference_date = match.group(2)
             partitions.add((code, reference_date))
-            logging.info(f"Found partition: code={code}, reference_date={reference_date}")
 
 # Build the list of partitions for Glue
 partition_inputs = []
@@ -137,7 +119,6 @@ for code, reference_date in partitions:
         },
         'Parameters': {}
     })
-    logging.info(f"Prepared partition input: {partition_location}")
 
 # Explicitly register partitions (in batches of up to 100)
 if partition_inputs:
