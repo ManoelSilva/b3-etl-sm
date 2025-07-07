@@ -31,7 +31,11 @@ schema_columns = [
     {'Name': 'part', 'Type': 'double'},
     {'Name': 'theoricalQty', 'Type': 'string'},
     {'Name': 'initial_date', 'Type': 'string'},
-    {'Name': 'part_sum_from_initial_date', 'Type': 'double'}
+    {'Name': 'mean_part_7_days', 'Type': 'double'},
+    {'Name': 'median_part_7_days', 'Type': 'double'},
+    {'Name': 'std_part_7_days', 'Type': 'double'},
+    {'Name': 'max_part_7_days', 'Type': 'double'},
+    {'Name': 'min_part_7_days', 'Type': 'double'}
 ]
 input_format = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
 output_format = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
