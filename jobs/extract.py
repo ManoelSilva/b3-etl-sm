@@ -3,7 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 import re
 
-## @params: [JOB_NAME]
+# @params: [JOB_NAME]
 # (Kept for compatibility, but not used)
 # args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
