@@ -86,15 +86,22 @@ else:
     print('No date found to calculate initial_date.')
     df = df.withColumn('initial_date', F.lit(None))
 
-# Add column with cumulative sum of 'part' from initial_date to reference_date, grouped by code
-window_spec = Window.partitionBy('code').orderBy(
-    'reference_date').rowsBetween(Window.unboundedPreceding, Window.currentRow)
-df = df.withColumn('part_sum_from_initial_date',
-                   F.sum(F.col('part')).over(window_spec))
+# Rolling window features: 7-day window, grouped by 'code', ordered by 'reference_date'
+window_7d = Window.partitionBy('code').orderBy('reference_date').rowsBetween(-6, 0)
 
-print("Schema after adding initial_date and part_sum_from_initial_date:")
+# Moving average of participation (mean)
+df = df.withColumn('mean_part_7_days', F.avg(F.col('part')).over(window_7d))
+# Moving median of participation (median)
+df = df.withColumn('median_part_7_days', F.expr('percentile_approx(part, 0.5)').over(window_7d))
+# Historical volatility (standard deviation)
+df = df.withColumn('std_part_7_days', F.stddev(F.col('part')).over(window_7d))
+# Recent historical maximum and minimum
+df = df.withColumn('max_part_7_days', F.max(F.col('part')).over(window_7d))
+df = df.withColumn('min_part_7_days', F.min(F.col('part')).over(window_7d))
+
+print("Schema after adding rolling window features:")
 df.printSchema()
-print('Sample data after adding initial_date and part_sum_from_initial_date:')
+print('Sample data after adding rolling window features:')
 df.show(5)
 
 # S3 bucket and output path
